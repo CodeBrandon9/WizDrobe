@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wizdrobe/SettingScreen.dart';
 void main() {
   runApp(const WizdrobeApp());
 }
@@ -16,7 +15,7 @@ class WizdrobeApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
-      home: const SettingScreen(),
+      home: const WardrobeScreen(),
     );
   }
 }
