@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'SettingScreen.dart';
 void main() {
   runApp(const WizdrobeApp());
 }
@@ -16,30 +16,7 @@ class WizdrobeApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
-      home: const MainNavigator(),
-    );
-  }
-}
-
-class MainNavigator extends StatefulWidget {
-  const MainNavigator({super.key});
-
-  @override
-  State<MainNavigator> createState() => _MainNavigatorState();
-}
-
-class _MainNavigatorState extends State<MainNavigator> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return IndexedStack(
-      index: _selectedIndex,
-      children: [
-        WardrobeScreen(onTabChange: (index) => setState(() => _selectedIndex = index)),
-        const CreateScreen(),
-        SavedOutfitsScreen(onTabChange: (index) => setState(() => _selectedIndex = index)),
-      ],
+      home: const SettingScreen(),
     );
   }
 }
@@ -493,12 +470,19 @@ class SavedOutfitsScreen extends StatelessWidget {
               selected: true,
               onTap: () => onTabChange(2),
             ),
+            _BottomTabItem(icon: Icons.add_box_outlined, label: 'Create'),
+            _BottomTabItem(icon: Icons.photo_library_outlined, label: 'Outfits'),
+            _BottomTabItem(icon: Icons.settings_outlined, label: 'Settings'),
           ],
         ),
       ),
     );
   }
 }
+
+
+
+
 
 class _BottomTabItem extends StatelessWidget {
   const _BottomTabItem({
