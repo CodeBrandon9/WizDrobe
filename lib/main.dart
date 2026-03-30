@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wizdrobe/SettingScreen.dart';
+
 void main() {
   runApp(const WizdrobeApp());
 }
@@ -16,7 +16,7 @@ class WizdrobeApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
-      home: const SettingScreen(),
+      home: const WardrobeScreen(),
     );
   }
 }
@@ -197,17 +197,12 @@ class WardrobeScreen extends StatelessWidget {
             ),
             _BottomTabItem(icon: Icons.add_box_outlined, label: 'Create'),
             _BottomTabItem(icon: Icons.photo_library_outlined, label: 'Outfits'),
-            _BottomTabItem(icon: Icons.settings_outlined, label: 'Settings'),
           ],
         ),
       ),
     );
   }
 }
-
-
-
-
 
 class _BottomTabItem extends StatelessWidget {
   const _BottomTabItem({
