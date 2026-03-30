@@ -16,13 +16,38 @@ class WizdrobeApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
         scaffoldBackgroundColor: const Color(0xFFF3F4F6),
       ),
-      home: const WardrobeScreen(),
+      home: const MainNavigator(),
+    );
+  }
+}
+
+class MainNavigator extends StatefulWidget {
+  const MainNavigator({super.key});
+
+  @override
+  State<MainNavigator> createState() => _MainNavigatorState();
+}
+
+class _MainNavigatorState extends State<MainNavigator> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return IndexedStack(
+      index: _selectedIndex,
+      children: [
+        WardrobeScreen(onTabChange: (index) => setState(() => _selectedIndex = index)),
+        const CreateScreen(),
+        SavedOutfitsScreen(onTabChange: (index) => setState(() => _selectedIndex = index)),
+      ],
     );
   }
 }
 
 class WardrobeScreen extends StatelessWidget {
-  const WardrobeScreen({super.key});
+  const WardrobeScreen({super.key, required this.onTabChange});
+
+  final Function(int) onTabChange;
 
   @override
   Widget build(BuildContext context) {
@@ -189,14 +214,285 @@ class WardrobeScreen extends StatelessWidget {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: const [
+          children: [
             _BottomTabItem(
               icon: Icons.checkroom_outlined,
               label: 'Wizdrobe',
               selected: true,
+              onTap: () => onTabChange(0),
             ),
-            _BottomTabItem(icon: Icons.add_box_outlined, label: 'Create'),
-            _BottomTabItem(icon: Icons.photo_library_outlined, label: 'Outfits'),
+            _BottomTabItem(
+              icon: Icons.add_box_outlined,
+              label: 'Create',
+              onTap: () => onTabChange(1),
+            ),
+            _BottomTabItem(
+              icon: Icons.photo_library_outlined,
+              label: 'Outfits',
+              onTap: () => onTabChange(2),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CreateScreen extends StatelessWidget {
+  const CreateScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 52,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF7F8FA),
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFFDFE3E8), width: 1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.checkroom_outlined,
+                    size: 18,
+                    color: Color(0xFF275AFF),
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Wizdrobe',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.5,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Create Screen\nComing Soon!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 64,
+        decoration: const BoxDecoration(
+          color: Color(0xFFF7F8FA),
+          border: Border(
+            top: BorderSide(color: Color(0xFFD1D5DB), width: 1),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _BottomTabItem(
+              icon: Icons.checkroom_outlined,
+              label: 'Wizdrobe',
+              onTap: () => Navigator.of(context).pop(),
+            ),
+            _BottomTabItem(
+              icon: Icons.add_box_outlined,
+              label: 'Create',
+              selected: true,
+              onTap: () {},
+            ),
+            _BottomTabItem(
+              icon: Icons.photo_library_outlined,
+              label: 'Outfits',
+              onTap: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SavedOutfitsScreen extends StatelessWidget {
+  const SavedOutfitsScreen({super.key, required this.onTabChange});
+
+  final Function(int) onTabChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 52,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF7F8FA),
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFFDFE3E8), width: 1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.checkroom_outlined,
+                    size: 18,
+                    color: Color(0xFF275AFF),
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Wizdrobe',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.5,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Saved Outfits',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -1.1,
+                              color: Color(0xFF000000),
+                            ),
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            height: 28,
+                            child: ElevatedButton.icon(
+                              onPressed: () {},
+                              icon: const Icon(Icons.add, size: 14),
+                              label: const Text(
+                                'Add',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF02062E),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.85,
+                        ),
+                        itemCount: 0,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE5E7EB),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 140),
+                      const Center(
+                        child: Text(
+                          'No saved outfits yet.',
+                          style: TextStyle(
+                            fontSize: 31,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF64748B),
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Center(
+                        child: Text(
+                          'Create and save your favorite outfits!',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF64748B),
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 64,
+        decoration: const BoxDecoration(
+          color: Color(0xFFF7F8FA),
+          border: Border(
+            top: BorderSide(color: Color(0xFFD1D5DB), width: 1),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _BottomTabItem(
+              icon: Icons.checkroom_outlined,
+              label: 'Wizdrobe',
+              onTap: () => onTabChange(0),
+            ),
+            _BottomTabItem(
+              icon: Icons.add_box_outlined,
+              label: 'Create',
+              onTap: () => onTabChange(1),
+            ),
+            _BottomTabItem(
+              icon: Icons.photo_library_outlined,
+              label: 'Outfits',
+              selected: true,
+              onTap: () => onTabChange(2),
+            ),
           ],
         ),
       ),
@@ -209,32 +505,37 @@ class _BottomTabItem extends StatelessWidget {
     required this.icon,
     required this.label,
     this.selected = false,
+    required this.onTap,
   });
 
   final IconData icon;
   final String label;
   final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final color = selected ? const Color(0xFF275AFF) : const Color(0xFF6B7280);
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 24, color: color),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: color,
-              fontWeight: FontWeight.w500,
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 24, color: color),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
