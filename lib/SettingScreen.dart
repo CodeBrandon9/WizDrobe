@@ -1,38 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:wizdrobe/SettingScreen.dart';
-void main() {
-  runApp(const WizdrobeApp());
-}
-
-class WizdrobeApp extends StatelessWidget {
-  const WizdrobeApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Wizdrobe',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
-        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
-      ),
-      home: const SettingScreen(),
-    );
-  }
-}
-
-class WardrobeScreen extends StatelessWidget {
-  const WardrobeScreen({super.key});
+class SettingScreen extends StatelessWidget {
+  const SettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final categories = <String>[
-      'All (0)',
-      'Tops (0)',
-      'Bottoms (0)',
-      'Shoes (0)',
-      'Outerwear (0)',
-      'Access. (0)',
+      'Setting 1',
+      'Setting 2',
+      'Setting 3',
+      'Setting 4',
+      'Setting 5',
+      'Setting 6',
     ];
 
     return Scaffold(
@@ -79,7 +57,7 @@ class WardrobeScreen extends StatelessWidget {
                       Row(
                         children: [
                           const Text(
-                            'My Wardrobe',
+                            'Settings',
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.w700,
@@ -92,9 +70,9 @@ class WardrobeScreen extends StatelessWidget {
                             height: 28,
                             child: ElevatedButton.icon(
                               onPressed: () {},
-                              icon: const Icon(Icons.add, size: 14),
+                              icon: const Icon(Icons.circle, size: 14),
                               label: const Text(
-                                'Add',
+                                'Apply',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -115,21 +93,14 @@ class WardrobeScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      GridView.builder(
+                      ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: 3.35,
-                        ),
                         itemCount: categories.length,
                         itemBuilder: (context, index) {
                           final isActive = index == 0;
                           return Container(
-                            alignment: Alignment.center,
+                            alignment: Alignment.topLeft,
                             decoration: BoxDecoration(
                               color: isActive
                                   ? const Color(0xFFF8FAFD)
@@ -139,37 +110,13 @@ class WardrobeScreen extends StatelessWidget {
                             child: Text(
                               categories[index],
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF111827),
                               ),
                             ),
                           );
                         },
-                      ),
-                      const SizedBox(height: 140),
-                      const Center(
-                        child: Text(
-                          'No items in your wardrobe yet.',
-                          style: TextStyle(
-                            fontSize: 31,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF64748B),
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      const Center(
-                        child: Text(
-                          'Tap "Add" to get started!',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF64748B),
-                            letterSpacing: -0.2,
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -193,20 +140,16 @@ class WardrobeScreen extends StatelessWidget {
             _BottomTabItem(
               icon: Icons.checkroom_outlined,
               label: 'Wizdrobe',
-              selected: true,
             ),
             _BottomTabItem(icon: Icons.add_box_outlined, label: 'Create'),
             _BottomTabItem(icon: Icons.photo_library_outlined, label: 'Outfits'),
-            _BottomTabItem(icon: Icons.settings_outlined, label: 'Settings'),
+            _BottomTabItem(icon: Icons.settings_outlined, label: 'Settings',selected: true),
           ],
         ),
       ),
     );
   }
 }
-
-
-
 
 
 class _BottomTabItem extends StatelessWidget {
