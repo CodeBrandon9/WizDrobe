@@ -8,6 +8,7 @@ import 'outfit_creator.dart';
 import 'setting_screen.dart';
 import 'webcam_capture_screen.dart';
 
+
 void main() {
   runApp(const WizdrobeApp());
 }
