@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'background_removal_service.dart';
 import 'outfit_creator.dart';
 import 'setting_screen.dart';
+import 'wardrobe_models.dart';
 import 'webcam_capture_screen.dart';
 
 
@@ -40,6 +41,7 @@ class RootShell extends StatefulWidget {
 class _RootShellState extends State<RootShell> {
   int _selectedIndex = 0;
   final List<WardrobeItem> _items = [];
+  final List<SavedOutfitEntry> _savedOutfits = [];
 
   void _addItem(WardrobeItem item) {
     setState(() {
@@ -61,8 +63,18 @@ class _RootShellState extends State<RootShell> {
         onAddItem: _addItem,
         onUpdateItem: _updateItem,
       ),
-      const OutfitCreator(),
-      const SavedOutfitsBody(),
+      OutfitCreator(
+        wardrobeItems: _items,
+        onSaveOutfit: (name, previewPng) {
+          setState(() {
+            _savedOutfits.insert(
+              0,
+              SavedOutfitEntry(name: name, previewBytes: previewPng),
+            );
+          });
+        },
+      ),
+      SavedOutfitsBody(outfits: _savedOutfits),
       const SettingScreen(),
     ];
 
@@ -98,22 +110,6 @@ class _RootShellState extends State<RootShell> {
     );
   }
 }
-
-class WardrobeItem {
-  const WardrobeItem({
-    required this.name,
-    required this.imageBytes,
-    required this.backgroundRemoved,
-    required this.category,
-  });
-
-  final String name;
-  final Uint8List imageBytes;
-  final bool backgroundRemoved;
-  final WardrobeCategory category;
-}
-
-enum WardrobeCategory { tops, bottoms, shoes, outerwear, accessories }
 
 class _AddItemFormResult {
   const _AddItemFormResult({
@@ -343,7 +339,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       .map(
                         (value) => DropdownMenuItem<WardrobeCategory>(
                           value: value,
-                          child: Text(_categoryLabel(value)),
+                          child: Text(wardrobeCategoryLabel(value)),
                         ),
                       )
                       .toList(),
@@ -792,7 +788,7 @@ class _WardrobeItemCardState extends State<_WardrobeItemCard> {
                 ),
               ),
               Text(
-                _categoryLabel(widget.item.category),
+                wardrobeCategoryLabel(widget.item.category),
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color(0xFF6B7280),
@@ -868,42 +864,82 @@ class _AppHeader extends StatelessWidget {
 }
 
 class SavedOutfitsBody extends StatelessWidget {
-  const SavedOutfitsBody({super.key});
+  const SavedOutfitsBody({super.key, required this.outfits});
+
+  final List<SavedOutfitEntry> outfits;
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: Column(
         children: [
-          _AppHeader(),
+          const _AppHeader(),
           Expanded(
-            child: Center(
-              child: Text(
-                'No saved outfits yet.',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: Color(0xFF64748B),
-                ),
-              ),
-            ),
+            child: outfits.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No saved outfits yet.',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemCount: outfits.length,
+                    itemBuilder: (context, index) {
+                      final o = outfits[index];
+                      return DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFE4E7EC)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: ColoredBox(
+                                    color: const Color(0xFFF3F4F6),
+                                    child: Image.memory(
+                                      o.previewBytes,
+                                      fit: BoxFit.contain,
+                                      width: double.infinity,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                o.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
-  }
-}
-
-String _categoryLabel(WardrobeCategory category) {
-  switch (category) {
-    case WardrobeCategory.tops:
-      return 'Tops';
-    case WardrobeCategory.bottoms:
-      return 'Bottoms';
-    case WardrobeCategory.shoes:
-      return 'Shoes';
-    case WardrobeCategory.outerwear:
-      return 'Outerwear';
-    case WardrobeCategory.accessories:
-      return 'Accessories';
   }
 }
