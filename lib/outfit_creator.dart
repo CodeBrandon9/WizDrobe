@@ -632,11 +632,16 @@ class DashedBorderContainer extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          double? boxHeight;
+          if (constraints.hasBoundedHeight) {
+            final h = constraints.maxHeight - 8.0;
+            boxHeight = h < 0 ? 0.0 : h;
+          }
           return CustomPaint(
             painter: _DashedRectPainter(),
             child: Container(
               width: double.infinity,
-              height: constraints.maxHeight - 8,
+              height: boxHeight,
               padding: const EdgeInsets.all(24),
               child: child,
             ),

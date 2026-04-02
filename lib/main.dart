@@ -429,7 +429,15 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
       ),
     );
 
-    nameController.dispose();
+    // Dispose the transient controller after a short delay to allow any
+    // internal widgets and animations to detach listeners. Disposing
+    // immediately can race with framework teardown and cause
+    // "used after being disposed" errors.
+    Future.delayed(const Duration(milliseconds: 150), () {
+      try {
+        nameController.dispose();
+      } catch (_) {}
+    });
     return result;
   }
 
