@@ -10,9 +10,20 @@ plugins {
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
+val androidSigningKeystorePath = System.getenv("ANDROID_SIGNING_KEYSTORE_PATH")
+
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+} else if (!androidSigningKeystorePath.isNullOrBlank()) {
+    // CI: secrets via env (e.g. GitHub Actions), no key.properties on disk
+    keystoreProperties["storeFile"] = androidSigningKeystorePath
+    keystoreProperties["storePassword"] = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: ""
+    keystoreProperties["keyPassword"] = System.getenv("ANDROID_KEY_PASSWORD") ?: ""
+    keystoreProperties["keyAlias"] = System.getenv("ANDROID_KEY_ALIAS") ?: ""
 }
+
+val releaseSigningConfigured =
+    keystorePropertiesFile.exists() || !androidSigningKeystorePath.isNullOrBlank()
 
 android {
     namespace = "com.example.wizdrobe"
@@ -40,7 +51,7 @@ android {
     }
 
     signingConfigs {
-        if (keystorePropertiesFile.exists()) {
+        if (releaseSigningConfigured) {
             create("release") {
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
