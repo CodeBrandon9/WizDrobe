@@ -6,17 +6,20 @@ Flutter app for organizing clothing in a **wardrobe**, building **outfits** on a
 
 **WizDrobe** is a closet companion app: photograph your clothes, organize them by category, compose outfits on a canvas, and browse saved outfit images—optionally with AI background removal when you add your own remove.bg API key.
 
-### Download and install
+### Install the built APK on an emulator or device (Android Studio)
 
-1. Get the APK in either place: **[Releases](https://github.com/CodeBrandon9/WizDrobe/releases)** (if a maintainer attached the APK), or **[Actions](https://github.com/CodeBrandon9/WizDrobe/actions)** → open the **Flutter CI** run for your tag → **Artifacts** → download **`app-release-…`** (a ZIP containing `app-release.apk`).
-2. Unzip if needed, then use the **`.apk`** file.
-3. On your phone, transfer the APK if you downloaded it on a computer (USB, cloud drive, email, etc.).
-4. Open the APK file (usually from **Files** or your **Downloads** app).
-5. If Android blocks installation: go to **Settings → Apps → Special app access → Install unknown apps** (wording varies by manufacturer), choose the app you used to open the APK (e.g. **Chrome** or **Files**), and allow **Install unknown apps**. Then open the APK again and confirm **Install**.
+1. Open Android Studio and start an emulator from **Device Manager**, or connect a physical Android phone with **USB debugging** enabled.
+2. Use the built APK at `build/app/outputs/flutter-apk/app-release.apk`.
+3. Install it with either method:
+   - **Drag and drop** `app-release.apk` onto the running emulator window, or
+   - Use terminal:
+     ```bash
+     adb devices
+     adb install -r "build/app/outputs/flutter-apk/app-release.apk"
+     ```
+4. Open **WizDrobe** on the emulator/device.
 
-   In short: **download the APK** (Releases or Actions artifact) → **allow “Install unknown apps”** for your browser or file manager → **open the APK** to install.
-
-This flow is for sideloading the GitHub-built APK, not the Google Play Store.
+This flow installs the already-built APK directly for testing in Android Studio.
 
 ### System requirements
 

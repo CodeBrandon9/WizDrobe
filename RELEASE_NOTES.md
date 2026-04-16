@@ -2,8 +2,6 @@
 
 ## Version 1.0.0 (Android)
 
-**Google Play listing:** version **1.0.0** (version code **1**) — from `pubspec.yaml` `1.0.0+1`.
-
 ### What’s new in 1.0.0
 
 Initial public release of WizDrobe: organize your clothes, design outfits on a canvas, and browse saved looks.
@@ -35,9 +33,22 @@ Initial public release of WizDrobe: organize your clothes, design outfits on a c
 - Wardrobe and outfits are kept **in memory** for this release; closing the app clears session data unless you add persistence in a future update.
 - Background removal requires a valid remove.bg key and network access.
 
+### Install the built APK on an emulator or device (Android Studio)
+
+1. Open Android Studio and start an emulator from **Device Manager**, or connect a physical Android phone with **USB debugging** enabled.
+2. Use the built APK at `build/app/outputs/flutter-apk/app-release.apk`.
+3. Install it with either method:
+   - **Drag and drop** `app-release.apk` onto the running emulator window, or
+   - Use terminal:
+     ```bash
+     adb devices
+     adb install -r "build/app/outputs/flutter-apk/app-release.apk"
+     ```
+4. Open **WizDrobe** on the emulator/device.
+
 ---
 
-### Short copy (Play Store “What’s new” — ~500 characters)
+### Short copy (“What’s new” — ~500 characters)
 
 ```
 WizDrobe 1.0.0 — first release!
