@@ -117,8 +117,8 @@ flutter test
 ```
 
 ## Team
-- Member A: [Name]
-- Member B: [Name]
-- Member C: [Name]
-- Member D: [Name]
-- Member E: [Name]
+- Member A: Brandon Thibodeaux
+- Member B: Scott Whitman
+- Member C: Megan Moss
+- Member D: Madison Ledg
+- Member E: Seth Nunez
