@@ -2,6 +2,57 @@
 
 Flutter app for organizing clothing in a **wardrobe**, building **outfits** on a canvas from those photos, and browsing **saved outfit previews**. Runs on **web** (Chrome/Edge), **Android**, **iOS**, **Windows**, **macOS**, and **Linux**.
 
+## Install (Android APK from GitHub)
+
+**WizDrobe** is a closet companion app: photograph your clothes, organize them by category, compose outfits on a canvas, and browse saved outfit images—optionally with AI background removal when you add your own remove.bg API key.
+
+### Install the built APK on an emulator or device (Android Studio)
+
+1. Open Android Studio and start an emulator from **Device Manager**, or connect a physical Android phone with **USB debugging** enabled.
+2. Use the built APK at `build/app/outputs/flutter-apk/app-release.apk`.
+3. Install it with either method:
+   - **Drag and drop** `app-release.apk` onto the running emulator window, or
+   - Use terminal:
+     ```bash
+     adb devices
+     adb install -r "build/app/outputs/flutter-apk/app-release.apk"
+     ```
+4. Open **WizDrobe** on the emulator/device.
+
+This flow installs the already-built APK directly for testing in Android Studio.
+
+### System requirements
+
+| Platform | Notes |
+|----------|--------|
+| **Android** | **Phone or tablet**; **API level** matches the Flutter default for this project (typically **Android 5.0, API 21+**—check `minSdk` in `android/app/build.gradle.kts` if you need the exact value). A camera helps for taking photos; gallery-only use is fine. |
+| **iOS** | There is **no APK** for iPhone/iPad. Use a **development build**, **TestFlight**, or **App Store** if your team ships an iOS binary separately. |
+
+### First use (golden path)
+
+1. Launch **WizDrobe** and use the bottom navigation to open **Wizdrobe** (wardrobe).
+2. Add at least one item: **Gallery** or **Camera**, then set a **name** and **category** (tops, bottoms, shoes, outerwear, accessories).
+3. *(Optional)* Turn **AI On** and paste your **remove.bg** API key in the header if you want **Remove background** on an item.
+4. Open **Create**: tap **Add from wardrobe**, choose an item to place it on the canvas; **tap** to select, **drag** to move, use the **corner handle** to resize; **long-press** the photo to remove it from the canvas.
+5. Tap **Save** to export the outfit image and send it to the **Outfits** tab.
+6. Open **Outfits** to see saved previews for this session.
+
+> **Screenshots:** Add images here for wardrobe grid, Create canvas with a selected item, and Outfits grid (replace this callout when assets are available).
+
+### Backend and sign-in
+
+- There is **no app account**, **Google sign-in**, or **team backend** in this build. Wardrobe and outfits stay **on the device for the current session** (data is cleared when you fully close the app unless you add persistence later).
+- The only **network** feature is optional **remove.bg** background removal: when you use it, the app calls **remove.bg’s API** over HTTPS with **your** API key (stored locally). No WizDrobe server is involved.
+
+### Troubleshooting
+
+| Issue | What to try |
+|--------|-------------|
+| **App won’t install on Android** | Enable **Install unknown apps** for the browser or file app you used (see Download and install). Uninstall any older conflicting build with the same package name if the installer reports a conflict. |
+| **“Remove background” or AI fails** | Confirm **AI Key** is set and **AI On** is enabled; check **Wi‑Fi/mobile data**; verify your remove.bg key and quota at [remove.bg](https://www.remove.bg/). |
+| **Blank or stuck screen on launch** | Force-stop the app and reopen. If you only see a white screen after granting permissions, restart the app once. (If you later add a login screen, add **internet** and account checks here.) |
+| **Data disappeared** | Expected in v1.x: items and outfits are **in-memory** until you close the app. |
+
 ## Features
 
 ### Wizdrobe (wardrobe)
@@ -24,13 +75,13 @@ Flutter app for organizing clothing in a **wardrobe**, building **outfits** on a
 ### Settings
 - App settings screen from the bottom navigation.
 
-## Setup
+## Setup (developers)
 
 ### Prerequisites
 - [Flutter SDK](https://docs.flutter.dev/get-started/install)
 - A target device: **Chrome/Edge** (web), **Android** emulator/device, **iOS** simulator/device (macOS), or desktop.
 
-### Install
+### Dependencies
 ```bash
 flutter pub get
 ```
@@ -69,8 +120,8 @@ flutter test
 ```
 
 ## Team
-- Member A: [Name]
-- Member B: [Name]
-- Member C: [Name]
-- Member D: [Name]
-- Member E: [Name]
+- Member A: Brandon Thibodeaux
+- Member B: Scott Whitman
+- Member C: Megan Moss
+- Member D: Madison Ledg
+- Member E: Seth Nunez

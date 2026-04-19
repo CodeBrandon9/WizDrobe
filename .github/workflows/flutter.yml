@@ -1,0 +1,79 @@
+name: Flutter CI
+
+on:
+  pull_request:
+  push:
+    tags:
+      - "*"
+
+# Pinned to Dart 3.11.x (Flutter 3.41.x) for pubspec sdk: ^3.11.4 — see https://docs.flutter.dev/install/archive
+env:
+  FLUTTER_VERSION: "3.41.5"
+
+jobs:
+  flutter_checks:
+    name: Analyze and test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cirruslabs/flutter:${{ env.FLUTTER_VERSION }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+  # Tag builds require repo secrets (Settings → Secrets and variables → Actions):
+  #   ANDROID_KEYSTORE_BASE64 — base64 of the upload keystore (.jks / .p12)
+  #   ANDROID_KEYSTORE_PASSWORD — keystore password
+  #   ANDROID_KEY_PASSWORD      — key password (often same as keystore)
+  #   ANDROID_KEY_ALIAS         — e.g. upload
+  build_apk:
+    name: Build release APK
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cirruslabs/flutter:${{ env.FLUTTER_VERSION }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Configure release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for var in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_PASSWORD ANDROID_KEY_ALIAS; do
+            if [ -z "${!var:-}" ]; then
+              echo "Missing secret: $var — add it under repo Settings → Secrets and variables → Actions."
+              exit 1
+            fi
+          done
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+
+      - name: Build APK
+        env:
+          ANDROID_SIGNING_KEYSTORE_PATH: upload-keystore.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-${{ github.ref_name }}
+          path: build/app/outputs/flutter-apk/app-release.apk
