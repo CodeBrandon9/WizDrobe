@@ -1,5 +1,38 @@
 # WizDrobe — Release notes
 
+## Version 1.1.0 (Android)
+
+### What is included in main (1.1.0)
+
+This release includes all updates currently merged into `main`, with a major focus on app personalization and UI consistency.
+
+**Settings and personalization**
+
+- New `ThemeProvider` architecture for centralized app theming.
+- Choose from multiple **color schemes** and apply them across the app.
+- Toggle **Dark Mode** from Settings.
+- Pick a **font family** (Google Fonts integration).
+- Select **Wardrobe layout mode**: Grid (2 columns), Grid (3 columns), or List.
+- Theme and layout preferences are persisted locally with `shared_preferences`.
+
+**UI and UX improvements**
+
+- Updated visual styling across navigation, wardrobe, create flow, and settings for better consistency.
+- Improved dark-mode aware colors in key surfaces and controls.
+- Added user feedback snackbars for theme/layout changes and key actions.
+
+**Technical updates**
+
+- Added `google_fonts` dependency and related lockfile updates.
+- Platform generated plugin files refreshed for desktop targets.
+
+### Notes
+
+- There is still no WizDrobe backend or account system in this release.
+- Wardrobe items and outfits remain session-local/in-memory unless persistence is added later.
+
+---
+
 ## Version 1.0.0 (Android)
 
 ### What’s new in 1.0.0
