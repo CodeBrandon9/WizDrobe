@@ -187,7 +187,9 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: ColoredBox(
-                                      color: const Color(0xFFF3F4F6),
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? const Color(0xFF374151)
+                                        : const Color(0xFFF3F4F6),
                                       child: Image.memory(
                                         item.imageBytes,
                                         fit: BoxFit.contain,
@@ -286,7 +288,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
   Widget _buildPiece(_PlacedPiece piece) {
     final selected = _selectedPieceId == piece.id;
     final borderColor =
-        selected ? const Color(0xFF275AFF) : const Color(0xFFE4E7EC);
+        selected ? Theme.of(context).colorScheme.primary : const Color(0xFFE4E7EC);
     final imageH = piece.imageHeight;
 
     void movePiece(DragUpdateDetails details) {
@@ -368,7 +370,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFF275AFF),
+                              color: Theme.of(context).colorScheme.primary,
                               width: 2,
                             ),
                             boxShadow: const [
@@ -378,10 +380,10 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.open_in_full,
                             size: 12,
-                            color: Color(0xFF275AFF),
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ),
@@ -426,28 +428,37 @@ class _OutfitCreatorState extends State<OutfitCreator> {
             Container(
               height: 52,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF7F8FA),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF374151)
+                    : const Color(0xFFF7F8FA),
                 border: Border(
-                  bottom: BorderSide(color: Color(0xFFDFE3E8), width: 1),
+                  bottom: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF4B5563)
+                        : const Color(0xFFDFE3E8),
+                    width: 1,
+                  ),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.checkroom_outlined,
                     size: 18,
-                    color: Color(0xFF275AFF),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     'Create outfit',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.4,
-                      color: Color(0xFF101828),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : const Color(0xFF101828),
                     ),
                   ),
                 ],
@@ -522,7 +533,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                                 : const Icon(Icons.save_outlined, size: 18),
                             label: Text(_saving ? 'Saving…' : 'Save'),
                             style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF275AFF),
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               foregroundColor: Colors.white,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'background_removal_service.dart';
 import 'outfit_creator.dart';
 import 'setting_screen.dart';
+import 'theme_provider.dart';
 import 'wardrobe_models.dart';
 import 'webcam_capture_screen.dart';
 
@@ -14,25 +15,49 @@ void main() {
   runApp(const WizdrobeApp());
 }
 
-class WizdrobeApp extends StatelessWidget {
+class WizdrobeApp extends StatefulWidget {
   const WizdrobeApp({super.key});
+
+  @override
+  State<WizdrobeApp> createState() => _WizdrobeAppState();
+}
+
+class _WizdrobeAppState extends State<WizdrobeApp> {
+  late ThemeProvider _themeProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _themeProvider = ThemeProvider();
+    _themeProvider.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    _themeProvider.removeListener(_onThemeChanged);
+    _themeProvider.dispose();
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Wizdrobe',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF275AFF)),
-        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
-      ),
-      home: const RootShell(),
+      theme: _themeProvider.theme,
+      home: RootShell(themeProvider: _themeProvider),
     );
   }
 }
 
 class RootShell extends StatefulWidget {
-  const RootShell({super.key});
+  final ThemeProvider themeProvider;
+
+  const RootShell({super.key, required this.themeProvider});
 
   @override
   State<RootShell> createState() => _RootShellState();
@@ -59,6 +84,7 @@ class _RootShellState extends State<RootShell> {
   Widget build(BuildContext context) {
     final pages = <Widget>[
       WardrobeScreen(
+        themeProvider: widget.themeProvider,
         items: _items,
         onAddItem: _addItem,
         onUpdateItem: _updateItem,
@@ -75,7 +101,7 @@ class _RootShellState extends State<RootShell> {
         },
       ),
       SavedOutfitsBody(outfits: _savedOutfits),
-      const SettingScreen(),
+      SettingScreen(themeProvider: widget.themeProvider),
     ];
 
     return Scaffold(
@@ -84,9 +110,13 @@ class _RootShellState extends State<RootShell> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFFF7F8FA),
-        selectedItemColor: const Color(0xFF275AFF),
-        unselectedItemColor: const Color(0xFF6B7280),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF374151)
+            : const Color(0xFFF7F8FA),
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF9CA3AF)
+            : const Color(0xFF6B7280),
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
@@ -136,11 +166,13 @@ class _PickedImageData {
 class WardrobeScreen extends StatefulWidget {
   const WardrobeScreen({
     super.key,
+    required this.themeProvider,
     required this.items,
     required this.onAddItem,
     required this.onUpdateItem,
   });
 
+  final ThemeProvider themeProvider;
   final List<WardrobeItem> items;
   final ValueChanged<WardrobeItem> onAddItem;
   final void Function(int index, WardrobeItem item) onUpdateItem;
@@ -322,24 +354,74 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Item Details',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF111827),
+                  ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Category',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF111827),
+                  ),
                 ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<WardrobeCategory>(
                   initialValue: category,
                   isExpanded: true,
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF111827),
+                    fontSize: 16,
+                  ),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF4B5563)
+                            : const Color(0xFFE5E7EB),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF4B5563)
+                            : const Color(0xFFE5E7EB),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF374151)
+                        : Colors.white,
+                  ),
                   items: WardrobeCategory.values
                       .map(
                         (value) => DropdownMenuItem<WardrobeCategory>(
                           value: value,
-                          child: Text(wardrobeCategoryLabel(value)),
+                          child: Text(
+                            wardrobeCategoryLabel(value),
+                            style: TextStyle(
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF111827),
+                            ),
+                          ),
                         ),
                       )
                       .toList(),
@@ -351,9 +433,14 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   },
                 ),
                 const SizedBox(height: 14),
-                const Text(
+                Text(
                   'Selected photo',
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF111827),
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Center(
@@ -363,7 +450,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: ColoredBox(
-                        color: const Color(0xFFF3F4F6),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFFF3F4F6)
+                            : const Color(0xFF374151),
                         child: Image.memory(
                           selectedImageBytes,
                           fit: BoxFit.contain,
@@ -377,15 +466,57 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                 TextField(
                   controller: nameController,
                   autofocus: true,
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : const Color(0xFF111827),
+                  ),
+                  decoration: InputDecoration(
                     hintText: 'Item name (e.g., Black hoodie)',
-                    border: OutlineInputBorder(),
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF9CA3AF)
+                          : const Color(0xFF6B7280),
+                    ),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF4B5563)
+                            : const Color(0xFFE5E7EB),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF4B5563)
+                            : const Color(0xFFE5E7EB),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF374151)
+                        : Colors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Expanded(child: Text('Remove background with AI')),
+                    Expanded(
+                      child: Text(
+                        'Remove background with AI',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : const Color(0xFF111827),
+                        ),
+                      ),
+                    ),
                     Switch.adaptive(
                       value: removeBackground,
                       onChanged: (value) {
@@ -593,7 +724,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                             size: 14,
                             color: _removeBgApiKey.trim().isEmpty
                                 ? const Color(0xFF6B7280)
-                                : const Color(0xFF275AFF),
+                                : Theme.of(context).colorScheme.primary,
                           ),
                           label: Text(
                             _removeBgApiKey.trim().isEmpty ? 'AI Key' : 'AI On',
@@ -601,7 +732,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                               fontSize: 12,
                               color: _removeBgApiKey.trim().isEmpty
                                   ? const Color(0xFF6B7280)
-                                  : const Color(0xFF275AFF),
+                                  : Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
@@ -705,12 +836,19 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: widget.themeProvider.wardrobeLayoutMode == WardrobeLayoutMode.grid3Column
+                              ? 3
+                              : widget.themeProvider.wardrobeLayoutMode == WardrobeLayoutMode.list
+                                  ? 1
+                                  : 2,
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
-                          childAspectRatio: 0.82,
+                          childAspectRatio: widget.themeProvider.wardrobeLayoutMode == WardrobeLayoutMode.list
+                              ? 3.3
+                              : widget.themeProvider.wardrobeLayoutMode == WardrobeLayoutMode.grid3Column
+                                  ? 0.7
+                                  : 0.82,
                         ),
                         itemCount: filteredEntries.length,
                         itemBuilder: (context, index) {
@@ -775,7 +913,9 @@ class _WardrobeItemCardState extends State<_WardrobeItemCard> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: ColoredBox(
-                    color: const Color(0xFFF3F4F6),
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFF3F4F6),
                     child: Image.memory(
                       widget.item.imageBytes,
                       width: double.infinity,
@@ -841,28 +981,37 @@ class _AppHeader extends StatelessWidget {
     return Container(
       height: 52,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: Color(0xFFF7F8FA),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF374151)
+            : const Color(0xFFF7F8FA),
         border: Border(
-          bottom: BorderSide(color: Color(0xFFDFE3E8), width: 1),
+          bottom: BorderSide(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF4B5563)
+                : const Color(0xFFDFE3E8),
+            width: 1,
+          ),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Icon(
             Icons.checkroom_outlined,
             size: 18,
-            color: Color(0xFF275AFF),
+            color: Theme.of(context).colorScheme.primary,
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Text(
             'Wizdrobe',
             style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.w500,
               letterSpacing: -0.5,
-              color: Color(0xFF101828),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : const Color(0xFF101828),
             ),
           ),
         ],
@@ -884,12 +1033,14 @@ class SavedOutfitsBody extends StatelessWidget {
           const _AppHeader(),
           Expanded(
             child: outfits.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       'No saved outfits yet.',
                       style: TextStyle(
                         fontSize: 24,
-                        color: Color(0xFF64748B),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF9CA3AF)
+                            : const Color(0xFF64748B),
                       ),
                     ),
                   )
@@ -907,9 +1058,15 @@ class SavedOutfitsBody extends StatelessWidget {
                       final o = outfits[index];
                       return DecoratedBox(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF374151)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE4E7EC)),
+                          border: Border.all(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF4B5563)
+                                : const Color(0xFFE4E7EC),
+                          ),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(8),
@@ -920,7 +1077,9 @@ class SavedOutfitsBody extends StatelessWidget {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: ColoredBox(
-                                    color: const Color(0xFFF3F4F6),
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? const Color(0xFF374151)
+                                        : const Color(0xFFF3F4F6),
                                     child: Image.memory(
                                       o.previewBytes,
                                       fit: BoxFit.contain,
