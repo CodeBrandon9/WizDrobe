@@ -27,8 +27,11 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      - name: Test
-        run: flutter test
+      - name: Unit and widget tests
+        run: flutter test test/
+
+      - name: E2E (integration tests)
+        run: flutter test integration_test/
 
   # Tag builds require repo secrets (Settings → Secrets and variables → Actions):
   #   ANDROID_KEYSTORE_BASE64 — base64 of the upload keystore (.jks / .p12)

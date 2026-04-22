@@ -20,9 +20,8 @@ class ThemeProvider extends ChangeNotifier {
   String _fontFamily = _defaultFontFamily;
   WardrobeLayoutMode _wardrobeLayoutMode = _defaultLayoutMode;
 
-  ThemeProvider() {
-    _initializeTheme();
-  }
+  /// Completes after [SharedPreferences] is loaded and in-memory theme fields match storage.
+  late final Future<void> prefsReady = _initializeTheme();
 
   Future<void> _initializeTheme() async {
     _prefs = await SharedPreferences.getInstance();

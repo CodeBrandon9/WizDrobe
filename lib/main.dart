@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,13 +12,22 @@ import 'theme_provider.dart';
 import 'wardrobe_models.dart';
 import 'webcam_capture_screen.dart';
 
+/// Minimal valid PNG (1×1) for integration tests when [WizdrobeApp.bypassImagePicker] is true.
+final Uint8List kGoldenPathTestPngBytes = Uint8List.fromList(
+  base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+  ),
+);
 
 void main() {
   runApp(const WizdrobeApp());
 }
 
 class WizdrobeApp extends StatefulWidget {
-  const WizdrobeApp({super.key});
+  const WizdrobeApp({super.key, this.bypassImagePicker = false});
+
+  /// When true, "Add" skips the gallery/camera flow and uses [kGoldenPathTestPngBytes].
+  final bool bypassImagePicker;
 
   @override
   State<WizdrobeApp> createState() => _WizdrobeAppState();
@@ -49,15 +60,23 @@ class _WizdrobeAppState extends State<WizdrobeApp> {
       debugShowCheckedModeBanner: false,
       title: 'Wizdrobe',
       theme: _themeProvider.theme,
-      home: RootShell(themeProvider: _themeProvider),
+      home: RootShell(
+        themeProvider: _themeProvider,
+        bypassImagePicker: widget.bypassImagePicker,
+      ),
     );
   }
 }
 
 class RootShell extends StatefulWidget {
   final ThemeProvider themeProvider;
+  final bool bypassImagePicker;
 
-  const RootShell({super.key, required this.themeProvider});
+  const RootShell({
+    super.key,
+    required this.themeProvider,
+    this.bypassImagePicker = false,
+  });
 
   @override
   State<RootShell> createState() => _RootShellState();
@@ -85,6 +104,7 @@ class _RootShellState extends State<RootShell> {
     final pages = <Widget>[
       WardrobeScreen(
         themeProvider: widget.themeProvider,
+        bypassImagePicker: widget.bypassImagePicker,
         items: _items,
         onAddItem: _addItem,
         onUpdateItem: _updateItem,
@@ -120,19 +140,20 @@ class _RootShellState extends State<RootShell> {
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.checkroom_outlined),
+            icon: Icon(Icons.checkroom_outlined, key: ValueKey('nav_wardrobe')),
             label: 'Wizdrobe',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_box_outlined),
+            icon: Icon(Icons.add_box_outlined, key: ValueKey('nav_create')),
             label: 'Create',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.photo_library_outlined),
+            icon:
+                Icon(Icons.photo_library_outlined, key: ValueKey('nav_outfits')),
             label: 'Outfits',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
+            icon: Icon(Icons.settings_outlined, key: ValueKey('nav_settings')),
             label: 'Settings',
           ),
         ],
@@ -167,12 +188,14 @@ class WardrobeScreen extends StatefulWidget {
   const WardrobeScreen({
     super.key,
     required this.themeProvider,
+    this.bypassImagePicker = false,
     required this.items,
     required this.onAddItem,
     required this.onUpdateItem,
   });
 
   final ThemeProvider themeProvider;
+  final bool bypassImagePicker;
   final List<WardrobeItem> items;
   final ValueChanged<WardrobeItem> onAddItem;
   final void Function(int index, WardrobeItem item) onUpdateItem;
@@ -206,35 +229,45 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
   }
 
   Future<void> _handleAddItem() async {
-    final source = await showDialog<ImageSource>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Item Photo'),
-        content: const Text('Choose how you want to add your clothing photo.'),
-        actions: [
-          TextButton.icon(
-            onPressed: () => Navigator.pop(context, ImageSource.gallery),
-            icon: const Icon(Icons.photo_library_outlined),
-            label: const Text('Gallery'),
-          ),
-          FilledButton.icon(
-            onPressed: () => Navigator.pop(context, ImageSource.camera),
-            icon: const Icon(Icons.photo_camera_outlined),
-            label: const Text('Camera'),
-          ),
-        ],
-      ),
-    );
-    if (source == null || !mounted) {
-      return;
-    }
+    late Uint8List selectedImageBytes;
+    late String pickedFileName;
 
-    final pickedImage = await _pickImage(source);
-    if (pickedImage == null || !mounted) {
-      return;
-    }
+    if (widget.bypassImagePicker) {
+      selectedImageBytes = kGoldenPathTestPngBytes;
+      pickedFileName = 'golden_path_test.png';
+    } else {
+      final source = await showDialog<ImageSource>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Add Item Photo'),
+          content: const Text('Choose how you want to add your clothing photo.'),
+          actions: [
+            TextButton.icon(
+              key: const ValueKey('add_item_source_gallery'),
+              onPressed: () => Navigator.pop(context, ImageSource.gallery),
+              icon: const Icon(Icons.photo_library_outlined),
+              label: const Text('Gallery'),
+            ),
+            FilledButton.icon(
+              key: const ValueKey('add_item_source_camera'),
+              onPressed: () => Navigator.pop(context, ImageSource.camera),
+              icon: const Icon(Icons.photo_camera_outlined),
+              label: const Text('Camera'),
+            ),
+          ],
+        ),
+      );
+      if (source == null || !mounted) {
+        return;
+      }
 
-    final selectedImageBytes = pickedImage.bytes;
+      final pickedImage = await _pickImage(source);
+      if (pickedImage == null || !mounted) {
+        return;
+      }
+      selectedImageBytes = pickedImage.bytes;
+      pickedFileName = pickedImage.fileName;
+    }
 
     final formResult = await _showAddItemDetailsDialog(
       selectedImageBytes: selectedImageBytes,
@@ -252,7 +285,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
         if (apiKey == null || !mounted) return;
         final processed = await _bgService.removeBackground(
           imageBytes: bytes,
-          fileName: pickedImage.fileName,
+          fileName: pickedFileName,
           apiKey: apiKey,
         );
         bytes = processed;
@@ -464,6 +497,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                 ),
                 const SizedBox(height: 14),
                 TextField(
+                  key: const ValueKey('add_item_name_field'),
                   controller: nameController,
                   autofocus: true,
                   style: TextStyle(
@@ -518,6 +552,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       ),
                     ),
                     Switch.adaptive(
+                      key: const ValueKey('add_item_remove_background_switch'),
                       value: removeBackground,
                       onChanged: (value) {
                         setLocalState(() {
@@ -537,6 +572,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     ),
                     const SizedBox(width: 8),
                     FilledButton(
+                      key: const ValueKey('add_item_continue'),
                       onPressed: () {
                         final name = nameController.text.trim();
                         if (name.isEmpty) return;
@@ -740,6 +776,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                         SizedBox(
                           height: 30,
                           child: ElevatedButton.icon(
+                            key: const ValueKey('wardrobe_add_item'),
                             onPressed: _handleAddItem,
                             icon: const Icon(Icons.add, size: 14),
                             label: const Text(

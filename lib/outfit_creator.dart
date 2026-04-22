@@ -174,6 +174,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                         borderRadius: BorderRadius.circular(12),
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
+                          key: ValueKey('wardrobe_picker_item_$index'),
                           onTap: () {
                             Navigator.pop(context);
                             _addPieceFromWardrobe(item);
@@ -470,6 +471,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                 child: Column(
                   children: [
                     TextField(
+                      key: const ValueKey('creator_outfit_name'),
                       controller: _nameController,
                       decoration: InputDecoration(
                         hintText: 'Outfit name (e.g., Summer casual)',
@@ -493,6 +495,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                             color: const Color(0xFFF7F8FA),
                             borderRadius: BorderRadius.circular(9),
                             child: InkWell(
+                              key: const ValueKey('creator_add_from_wardrobe'),
                               onTap: _openWardrobePicker,
                               borderRadius: BorderRadius.circular(9),
                               child: const SizedBox(
@@ -520,6 +523,7 @@ class _OutfitCreatorState extends State<OutfitCreator> {
                         SizedBox(
                           height: 44,
                           child: FilledButton.icon(
+                            key: const ValueKey('creator_save_outfit'),
                             onPressed: _saving ? null : _saveOutfit,
                             icon: _saving
                                 ? const SizedBox(

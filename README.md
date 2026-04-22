@@ -113,10 +113,29 @@ Add a remove.bg API key in the app (wardrobe screen) before using **Remove backg
 - remove.bg client: `lib/background_removal_service.dart`
 - Webcam UI (web + camera): `lib/webcam_capture_screen.dart`
 
-## Tests
+## Testing
+
+Automated checks run on **every pull request** via GitHub Actions (**Flutter CI**): `flutter pub get` → `flutter analyze` → `flutter test test/` → `flutter test integration_test/`.
+
+- **Workflow file:** [`.github/workflows/flutter.yml`](.github/workflows/flutter.yml)
+- **CI runs on GitHub:** open the repo → **Actions** → select workflow **Flutter CI** (URL pattern: `https://github.com/<org>/<repo>/actions/workflows/flutter.yml`, substituting your org and repo name).
+
+More detail, device notes for E2E, and troubleshooting: **[TESTING.md](TESTING.md)**.
+
+### Copy-paste (from package root)
+
 ```bash
+flutter pub get
 flutter analyze
-flutter test
+flutter test test/
+flutter test integration_test/
+```
+
+**Coverage** (writes `coverage/lcov.info`; use [LCOV](https://github.com/linux-test-project/lcov) to summarize line %):
+
+```bash
+flutter test test/ --coverage
+# optional: lcov --summary coverage/lcov.info
 ```
 
 ## Team
